@@ -15,7 +15,29 @@ async function getOrders() {
         ORDER BY o.id
     `)
 
-    return rows
+    const ordersMap = {}
+
+    rows.forEach(row => {
+        if (!ordersMap[row.order_id]) {
+            ordersMap[row.order_id] = {
+                id: row.order_id,
+                user: row.user,
+                items: [],
+                total: 0
+            }
+        }
+
+    const subtotal = row.quantity * row.unit_price
+        ordersMap[row.order_id].total += subtotal
+
+        ordersMap[row.order_id].items.push({
+            product: row.product,
+            quantity: row.quantity,
+            unit_price: row.unit_price
+        })
+    })
+
+    return Object.values(ordersMap)
 }
 
 async function createOrder(user_id) {
